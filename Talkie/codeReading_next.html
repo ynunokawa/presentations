@@ -1,0 +1,333 @@
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>L.codeReading #2</title>
+  <link rel="stylesheet" href="./dist/talkie.min.css">
+  <link rel="stylesheet" href="./dist/talkie-default.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/styles/monokai_sublime.min.css">
+</head>
+<body>
+
+<!-- put your slides -->
+
+<template layout="cover" type="text/x-markdown">
+# L.codeReading #?
+
+## L.Marker | L.Path
+
+</template>
+
+<template layout="bullets" type="text/x-markdown">
+## 前回のおさらい
+
+- ポイント | ポリライン・ポリゴンの地図上での描画方式が異なる
+  - L.Marker | L.Path
+- 親の DOM も異なる
+- L.Marker は DOM を L.Icon に作らせてる
+- L.Icon を SVG Path を作るように extend してもマーカーごとに SVG 領域ができあがって美しくない (腑に落ちない)
+- L.Path を extend してマーカーもベクターで描画できるようにできないか <- ココマデ c⌒っ.ω.)っ
+</template>
+
+<template layout="bullets" type="text/x-markdown">
+## 今回
+
+- L.Path を extend してマーカーもベクターで描画できるようにできないかやってみたが...
+- よくよく考えてみたらヘビーユースしてる L.GeoJSON とかポイントは自動的に L.Marker を呼ぶんだよ
+- L.Path で頑張っても汎用性ない -> L.GeoJSON やら何やら芋づる式に extend しなきゃいけなくなる
+- そして予想以上に Leaflet のアーキテクチャーを改変しなきゃならなくなりそうな気配
+- __一応 L.Path の中身の話もしつつ__
+- __苦肉の策として今やってる手法 (DivIcon に SVG > Path つっこむ) を使いやすくクラス化してみる__
+</template>
+
+<template layout="title" invert type="text/x-markdown"
+          backface="img/ra-men2.jpg"
+          backface-filter="blur(3px) brightness(.9)">
+# L.Path
+
+## (src/layer/vector/Path.js)
+</template>
+
+<template layout="title" invert type="text/x-markdown"
+          backface="img/ra-men2.jpg"
+          backface-filter="blur(3px) brightness(.9)">
+# L.VectorIcon
+
+## (L.Icon の extend)
+
+### 参考: map-effects-100 (#5と#8)
+https://github.com/muxlab/map-effects-100
+</template>
+
+<template layout="bullets" type="text/x-markdown">
+## map-effects-100 の場合
+
+- [05_svg-marker-animation.html](https://github.com/muxlab/map-effects-100/blob/gh-pages/Leaflet/05_svg-marker-animation.html) (#5)
+  - `<path>` の `d` 属性にアイコンのパスコマンドを定義
+  - [サンプル](http://muxlab.github.io/map-effects-100/Leaflet/05_svg-marker-animation.html)
+- [08_time-animation.html](https://github.com/muxlab/map-effects-100/blob/gh-pages/Leaflet/08_time-animation.html) (#8)
+  - `<circle>` の `r` 属性に半径を定義
+  - [サンプル](http://muxlab.github.io/map-effects-100/Leaflet/08_time-animation.html)
+- それ以外
+  - 四角形を作る場合は `<rect>` を使う
+
+</template>
+
+<template layout="bullets" type="text/x-markdown">
+## L.VectorIcon がサポートすべき SVG シェイプ
+
+- `<path>`: 複雑な形状 (SVG アイコンなどはコレ)
+- `<circle>`: 円
+- `<rect>`: 四角形
+
+SVG シェープに関しては [SVG 要素リファレンス | MDN](https://developer.mozilla.org/ja/docs/Web/SVG/Element) を参照してね
+</template>
+
+<template layout="code" type="text/x-markdown">
+## L.VectorIcon のコンストラクタ(案)
+
+```js
+var vectorIcon = new L.VectorIcon({
+  className: 'my-vector-icon'
+  svgHeight: 64,
+  svgWidth: 64,
+  type: 'path', // path | circle | rect
+  shape: {
+    /* path */
+    d: 'M23.963,20...'
+  },
+});
+```
+</template>
+
+<template layout="code" type="text/x-markdown">
+## L.VectorIcon のコンストラクタ(案)
+
+```js
+var vectorIcon = new L.VectorIcon({
+  className: 'my-vector-icon'
+  svgHeight: 64,
+  svgWidth: 64,
+  type: 'circle', // path | circle | rect
+  shape: {
+    r: 30,
+    cx: 32,
+    cy: 32
+  }
+});
+```
+</template>
+
+<template layout="code" type="text/x-markdown">
+## L.VectorIcon のコンストラクタ(案)
+
+```js
+var vectorIcon = new L.VectorIcon({
+  className: 'my-vector-icon'
+  svgHeight: 64,
+  svgWidth: 64,
+  type: 'rect', // path | circle | rect
+  shape: {
+    x: 2,
+    y: 2,
+    width: 60,
+    height: 60
+  }
+});
+```
+</template>
+
+<!--<template layout="bullets" type="text/x-markdown">
+## 機能 (Japanese)
+
+- Markdown書けるよ (੭ु˵＞ヮ＜)੭ु⁾⁾
+- ハイライトばっちり _:(°ω° 」∠):＿
+- レスポンシブだよ (^з^)-☆
+- フルスクリーン対応 (press `F`) (｡•̀ᴗ-)✧
+- ポインターだせるよ (press `B`) ( ꒪◡꒪)
+- 属性でレイアウトできるよ (*´▽`)
+- 進行度インジゲータあるよ c⌒っ.ω.)っ
+</template>
+
+<template layout="code" type="text/x-markdown">
+## in HTML
+
+```html
+<section layout="title">
+  <h1>Section Title</h1>
+  <p>Lorem ipsum dolor sit amet, consect...</p>
+</section>
+
+<section layout="bullets">
+  <h2>The bullets</h2>
+  <ul>
+    <li>Foo</li>
+    <li>Bar</li>
+    <li>Baz</li>
+  </ul>
+</section>
+```
+</template>
+
+<template layout="code" type="text/x-markdown">
+## in Markdown
+
+```html
+<script layout="title" type="text/x-markdown">
+# Section Title
+Lorem ipsum dolor sit amet, consect...
+</script>
+
+<script layout="bullets" type="text/x-markdown">
+## The bullets
+- Foo
+- Bar
+- Baz
+</script>
+```
+
+You can use `template` element instead of `script`.
+</template>
+
+<template layout="code" type="text/x-markdown">
+## Backface image & filter
+
+```html
+<section layout
+         backface="background-image.jpg"
+         backface-filter="blur(1px) brightness(.8)">
+
+  <h1>Title</h1>
+  <p>foo, bar, baz, qux...</p>
+
+</section>
+```
+</template>
+
+<template layout="title" invert type="text/x-markdown"
+          backface="https://farm8.staticflickr.com/7469/16209884502_211d01ac0d_z_d.jpg"
+          backface-filter="blur(3px) brightness(.9)">
+# Backface DEMO (北極)
+
+`backface-filter="blur(3px) brightness(.9)"`
+</template>
+
+<template layout="bullets" type="text/x-markdown">
+## FullScreen mode
+
+When you press the **"f"** key will be a full-screen mode. "f" or "Esc" key Press and then exit.
+</template>
+
+<template layout="bullets" type="text/x-markdown">
+## Pointer mode
+
+When you press the **"b"** key, the pointer `visibility` is toggled
+</template>
+
+<template layout="bullets" type="text/x-markdown">
+## Presenter note
+
+Open developer tools, will show presenter notes
+
+-----
+
+Yes! This is your note!
+</template>
+
+<template layout="code" type="text/x-markdown">
+## Custom key binding & control (1/2)
+
+```javascript
+var talkie  = Talkie({wide:false});
+
+talkie.next.plug(talkie.control.key('space'));
+talkie.next.plug(talkie.control.key('s'));
+talkie.next.plug(talkie.control.key('n'));
+talkie.prev.plug(talkie.control.key('a'));
+talkie.prev.plug(talkie.control.key('p'));
+```
+</template>
+
+<template layout="code" type="text/x-markdown">
+## Custom key binding & control (2/2)
+
+```javascript
+window.next = function() {
+  talkie.next.push();
+};
+window.prev = function() {
+  talkie.prev.push();
+};
+window.jump = function(num) {
+  talkie.jump.push(num);
+};
+```
+</template>
+
+<template layout="code" type="text/x-markdown">
+## All Options
+
+```javascript
+/**
+ * @typedef {Object} TalkieOptions
+ * @property {Boolean} [api=false]
+ * @property {Boolean} [wide=false]
+ * @property {Boolean} [control=true]
+ * @property {Boolean} [pointer=true]
+ * @property {Boolean} [progress=true]
+ * @property {Boolean} [backface=true]
+ * @property {Boolean} [notransition=false]
+ */
+
+Talkie(options);
+```
+</template>
+
+<script layout="code" type="text/x-markdown">
+## All Exports
+
+```javascript
+/**
+ * @typedef {Object} TalkieExport
+ * @param {Object.<Function>} control
+ * @param {Bacon.EventStream} changed
+ * @param {Bacon.Bus} next
+ * @param {Bacon.Bus} prev
+ * @param {Bacon.Bus} jump
+ * @param {Bacon.Property} ratio
+ * @param {Array.<String>} notes
+ */
+
+/* @type {TalkieExport} */
+var talkie = Talkie();
+```
+</script>-->
+
+<template layout="cover" type="text/x-markdown">
+## Thanks!
+
+[ahomu/Talkie - GitHub.com](https://github.com/ahomu/Talkie)
+
+[Top](#1)
+</template>
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/highlight.min.js"></script>
+<script src="./dist/talkie.js"></script>
+<script>
+var talkie = Talkie({wide: false});
+
+talkie.next.plug(talkie.control.keydown('s'));
+talkie.next.plug(talkie.control.keydown('n'));
+talkie.prev.plug(talkie.control.keydown('a'));
+talkie.prev.plug(talkie.control.keydown('p'));
+
+document.addEventListener('DOMContentLoaded', function() {
+  var slides = Array.prototype.slice.call(document.querySelectorAll('[layout]'));
+  talkie.changed.onValue(function(current) {
+    console.clear();
+    // print presenter notes
+    console.info(talkie.notes[current.getAttribute('page')]);
+  });
+});
+</script>
+</body>
+</html>

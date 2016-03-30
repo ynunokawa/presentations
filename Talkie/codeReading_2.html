@@ -1,0 +1,456 @@
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>L.codeReading #2</title>
+  <link rel="stylesheet" href="./dist/talkie.min.css">
+  <link rel="stylesheet" href="./dist/talkie-default.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/styles/monokai_sublime.min.css">
+</head>
+<body>
+
+<!-- put your slides -->
+
+<template layout="cover" type="text/x-markdown">
+# L.codeReading #2
+
+## L.Marker | L.Path
+
+</template>
+
+<template layout="bullets" type="text/x-markdown">
+## 前置き
+
+- プライベート (=業務時間外) に [MUX Lab](https://muxlab.github.io/) というプロジェクトで
+Leaflet を使った地図表現の実験を行ってます
+- 昨年の11月に始めたばかり
+- Esri France のエンジニア (すでに転職したっぽい) が開発に参加してくれたり
+- 興味ある人は気軽に Join してね c⌒っ.ω.)っ
+</template>
+
+<template layout="bullets" type="text/x-markdown">
+[map-effects-100](https://github.com/muxlab/map-effects-100)
+
+<img src="https://github.com/muxlab/map-effects-100/raw/gh-pages/MapEffects100.png" style="">
+</template>
+
+<template layout="bullets" type="text/x-markdown">
+[geojson-catalog](https://github.com/muxlab/geojson-catalog)
+
+<img src="https://github.com/muxlab/geojson-catalog/raw/gh-pages/img/GeoJSONCatalog_readme.png" style="">
+</template>
+
+<template layout="bullets" type="text/x-markdown">
+[pm-mapper](https://github.com/muxlab/pm-mapper) & [pm-sync-controller](https://github.com/muxlab/pm-sync-controller)
+
+<img src="https://camo.githubusercontent.com/89f90c7a1e9563c5a9061e351f45bc2ad5d4ed3f/68747470733a2f2f646c2e64726f70626f7875736572636f6e74656e742e636f6d2f752f31333038373737332f6d75786c61622f73796e636d61702d636f6d70726573736f722e676966" style="">
+</template>
+
+<template layout="bullets" type="text/x-markdown">
+[map-chatter](https://github.com/muxlab/map-chatter)
+
+<img src="https://github.com/muxlab/map-chatter/raw/master/map-chatter.png" style="">
+</template>
+
+<template layout="bullets" type="text/x-markdown">
+## I ♥ CSS3
+
+地図上のグラフィックでいろいろやってるのだが、SVG の操作は JavaScript に頼らず CSS3 だけでいろいろできたりして楽しい。
+
+- [animation](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Animations/Using_CSS_animations)
+- [transition](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Transitions/Using_CSS_transitions)
+</template>
+
+<template layout="bullets" type="text/x-markdown">
+<iframe src="http://muxlab.github.io/" style="height:90%;width:90%;display:block;"></iframe>
+</template>
+
+<template layout="code" type="text/x-markdown">
+## これだけっす
+
+```css
+path {
+  transition-property: fill, fill-opacity, stroke, stroke-opacity, stroke-width;
+  transition-duration: 0.4s;
+  stroke-dashoffset: 700;
+  stroke-dasharray: 700;
+  stroke-linecap: round;
+}
+```
+</template>
+
+<template layout="cover" type="text/x-markdown">
+# L.codeReading #2
+
+## L.Marker | L.Path
+</template>
+
+<template layout="bullets" type="text/x-markdown">
+## L.Marker | L.Path
+
+- ポイント: [`L.Marker`](http://leafletjs.com/reference.html#marker)
+- ライン/ポリゴン: [`L.Path`](http://leafletjs.com/reference.html#path) > `L.Polyline` | `L.Polygon`
+</template>
+
+<template layout="bullets" type="text/x-markdown">
+## L.Marker | L.Path
+
+- もとをたどれば、どちらも親は `L.Layer` (`L.Layer` の親は `L.Evented`)
+- だが、ウィンドウ上にどうジオメトリを表現するかの考え方が異なる
+- 現に DOM 上でも配置される親要素が異なる
+
+※ちなみに `L.Path` 系が一緒くたに単一親要素内に並列でぶち込まれている(松浦談)が今回はここには触れません
+</template>
+
+<template layout="code" type="text/x-markdown">
+## L.Marker | L.Path の DOM
+
+```html
+<!-- L.Marker の実体-->
+<div class="leaflet-marker-pane">
+  <img src="marker-icon.png">
+</div>
+<!-- L.Path の実体 -->
+<div class="leaflet-overlay-pane">
+  <svg class="leaflet-zoom-animated">
+    <g><path></path></g>
+  </svg>
+</div>
+```
+</template>
+
+<template layout="bullets" type="text/x-markdown">
+## `<img>` だと..
+</template>
+
+<template layout="bullets" type="text/x-markdown">
+<iframe src="http://leafletjs.com/examples/quick-start-example.html" style="height:90%;width:90%;display:block;"></iframe>
+</template>
+
+<template layout="bullets" type="text/x-markdown">
+## ちなみに..
+
+- DivIcon
+- SVGMarker?
+</template>
+
+<template layout="bullets" type="text/x-markdown">
+## Dive to source!!
+
+<img src="img/github-icon.png" style="height:200px;">
+
+### [L.Marker](https://github.com/Leaflet/Leaflet/blob/master/src/layer/marker/Marker.js) | [L.Path](https://github.com/Leaflet/Leaflet/blob/master/src/layer/vector/Path.js)
+</template>
+
+<template layout="title" invert type="text/x-markdown"
+          backface="img/ra-men1.jpg"
+          backface-filter="blur(3px) brightness(.9)">
+# L.Marker
+
+## (src/layer/marker/Marker.js)
+</template>
+
+<template layout="code" type="text/x-markdown">
+## L.Marker (src/layer/marker/Marker.js)
+
+```js
+L.Marker = L.Layer.extend({
+  ...
+});
+
+// おまじない
+L.marker = function (latlng, options) {
+  return new L.Marker(latlng, options);
+};
+```
+</template>
+
+<template layout="bullets" type="text/x-markdown">
+## メモ (L.Marker)
+
+- `this.initIcon()` の中でアイコンと影の `<img>` 要素を `L.Icon` に作らせてる。
+純粋な SVG マーカーを作りたい場合は、ここをリライトして、`L.Icon` も `extend` する必要あり。
+- 実際のマーカー要素の配置とかは　`L.DomUtil` がやってくれてる
+- `this._animateZoom` は `this.update` の `return this` がないだけ
+  - 新しい位置 (`opt.zoom` と `opt.center`) をもとにピクセル座標作ってウィンドウ上の要素に反映
+</template>
+
+<template layout="bullets" type="text/x-markdown">
+## initialize(latlng, options)
+
+- 初期化
+- `setOptions` 関数で `options` を設定
+- `_latlng` プロパティに緯度経度を定義 (`L.latlng(latlng)``)
+</template>
+
+<template layout="bullets" type="text/x-markdown">
+## onAdd(map)
+
+- `_zoomAnimamted` プロパティを定義？
+- `this._initIcon()`
+- `this.update()`
+</template>
+
+<template layout="bullets" type="text/x-markdown">
+## update()
+
+- `this._icon` が定義されていれば..
+  - `this._map.latlngToLayerPoint()` で緯度経度 (`this._latlng`) をもとにポイントを投影してくれる
+  - 上の関数で作成した投影座標 (ピクセル？) をもとに `this._setPos()` でマーカーを配置
+- `this` を返す
+</template>
+
+<template layout="bullets" type="text/x-markdown">
+## initIcon()
+
+- `icon` 変数に `options.icon.createIcon` 関数でアイコンの `<img>` 要素を定義
+  - `L.Icon.createIcon()` が `L.Icon.createImg` で作成した `<img>` 要素を返す
+  - __`L.Marker` が `L.Icon` に `<img>` を作らせてる__
+  - `L.DivIcon` で `<div>` に置き換えられるし、そりゃそうなんだけどね
+- 既存のアイコンと異なるアイコンの場合
+  - 既存のアイコンは削除
+  - `options.title` が定義されていれば `icon.title` に代入
+  - `options.alt` が定義されていれば `icon.alt` に代入
+</template>
+
+<template layout="bullets" type="text/x-markdown">
+## initIcon()
+
+- `L.DomUtil.addClass()` で `icon` に CSS クラス (`classToAdd`) を追加
+  - `classToAdd = 'leaflet-zoom-' + (this._zoomAnimated ? 'animated' : 'hide');`
+- `options.keyboard` が定義されていれば `icon.tabIndex = '0'`
+- 上記の設定を行った上で `this._icon` に `icon` を代入
+</template>
+
+<template layout="bullets" type="text/x-markdown">
+## initIcon()
+
+- `options.riseOnHover` が定義されていればイベントを定義 (`L.Evented` から継承した `on` 関数) -> ホバー時にマーカーが一番上に来るようにする
+  - `mouseover: this._bringToFront`
+  - `mouseout: this._resetZIndex`
+- `icon` の影を作る
+  - 流れはアイコン用の `<img>` 要素作る過程と類似
+- アイコン `<img>` 要素を `'markerPane'` の子要素に追加
+- `this._initInteraction()`
+- 影 `<img>` 要素を `'shadowPane'` の子要素に追加
+</template>
+
+<template layout="bullets" type="text/x-markdown">
+## _setPos(pos)
+
+- 引数には `this._map.latlngToLayerPoint()` で投影したっぽいピクセル座標値が入ってる？
+- `L.DomUtil.setPosition()` で実際に DOM 要素を適切な位置に配置？
+- `this._zIndex` に `pos.y + this.options.zIndexOffset` (なんだこれ)　を代入
+- `this._resetZIndex()`
+</template>
+
+
+
+<template layout="bullets" type="text/x-markdown">
+## ...
+
+- ...
+</template>
+
+<template layout="title" invert type="text/x-markdown"
+          backface="img/ra-men2.jpg"
+          backface-filter="blur(3px) brightness(.9)">
+# L.Path
+
+## (src/layer/vector/Path.js)
+</template>
+
+<!--<template layout="bullets" type="text/x-markdown">
+## 機能 (Japanese)
+
+- Markdown書けるよ (੭ु˵＞ヮ＜)੭ु⁾⁾
+- ハイライトばっちり _:(°ω° 」∠):＿
+- レスポンシブだよ (^з^)-☆
+- フルスクリーン対応 (press `F`) (｡•̀ᴗ-)✧
+- ポインターだせるよ (press `B`) ( ꒪◡꒪)
+- 属性でレイアウトできるよ (*´▽`)
+- 進行度インジゲータあるよ c⌒っ.ω.)っ
+</template>
+
+<template layout="code" type="text/x-markdown">
+## in HTML
+
+```html
+<section layout="title">
+  <h1>Section Title</h1>
+  <p>Lorem ipsum dolor sit amet, consect...</p>
+</section>
+
+<section layout="bullets">
+  <h2>The bullets</h2>
+  <ul>
+    <li>Foo</li>
+    <li>Bar</li>
+    <li>Baz</li>
+  </ul>
+</section>
+```
+</template>
+
+<template layout="code" type="text/x-markdown">
+## in Markdown
+
+```html
+<script layout="title" type="text/x-markdown">
+# Section Title
+Lorem ipsum dolor sit amet, consect...
+</script>
+
+<script layout="bullets" type="text/x-markdown">
+## The bullets
+- Foo
+- Bar
+- Baz
+</script>
+```
+
+You can use `template` element instead of `script`.
+</template>
+
+<template layout="code" type="text/x-markdown">
+## Backface image & filter
+
+```html
+<section layout
+         backface="background-image.jpg"
+         backface-filter="blur(1px) brightness(.8)">
+
+  <h1>Title</h1>
+  <p>foo, bar, baz, qux...</p>
+
+</section>
+```
+</template>
+
+<template layout="title" invert type="text/x-markdown"
+          backface="https://farm8.staticflickr.com/7469/16209884502_211d01ac0d_z_d.jpg"
+          backface-filter="blur(3px) brightness(.9)">
+# Backface DEMO (北極)
+
+`backface-filter="blur(3px) brightness(.9)"`
+</template>
+
+<template layout="bullets" type="text/x-markdown">
+## FullScreen mode
+
+When you press the **"f"** key will be a full-screen mode. "f" or "Esc" key Press and then exit.
+</template>
+
+<template layout="bullets" type="text/x-markdown">
+## Pointer mode
+
+When you press the **"b"** key, the pointer `visibility` is toggled
+</template>
+
+<template layout="bullets" type="text/x-markdown">
+## Presenter note
+
+Open developer tools, will show presenter notes
+
+-----
+
+Yes! This is your note!
+</template>
+
+<template layout="code" type="text/x-markdown">
+## Custom key binding & control (1/2)
+
+```javascript
+var talkie  = Talkie({wide:false});
+
+talkie.next.plug(talkie.control.key('space'));
+talkie.next.plug(talkie.control.key('s'));
+talkie.next.plug(talkie.control.key('n'));
+talkie.prev.plug(talkie.control.key('a'));
+talkie.prev.plug(talkie.control.key('p'));
+```
+</template>
+
+<template layout="code" type="text/x-markdown">
+## Custom key binding & control (2/2)
+
+```javascript
+window.next = function() {
+  talkie.next.push();
+};
+window.prev = function() {
+  talkie.prev.push();
+};
+window.jump = function(num) {
+  talkie.jump.push(num);
+};
+```
+</template>
+
+<template layout="code" type="text/x-markdown">
+## All Options
+
+```javascript
+/**
+ * @typedef {Object} TalkieOptions
+ * @property {Boolean} [api=false]
+ * @property {Boolean} [wide=false]
+ * @property {Boolean} [control=true]
+ * @property {Boolean} [pointer=true]
+ * @property {Boolean} [progress=true]
+ * @property {Boolean} [backface=true]
+ * @property {Boolean} [notransition=false]
+ */
+
+Talkie(options);
+```
+</template>
+
+<script layout="code" type="text/x-markdown">
+## All Exports
+
+```javascript
+/**
+ * @typedef {Object} TalkieExport
+ * @param {Object.<Function>} control
+ * @param {Bacon.EventStream} changed
+ * @param {Bacon.Bus} next
+ * @param {Bacon.Bus} prev
+ * @param {Bacon.Bus} jump
+ * @param {Bacon.Property} ratio
+ * @param {Array.<String>} notes
+ */
+
+/* @type {TalkieExport} */
+var talkie = Talkie();
+```
+</script>-->
+
+<template layout="cover" type="text/x-markdown">
+## Thanks!
+
+[ahomu/Talkie - GitHub.com](https://github.com/ahomu/Talkie)
+
+[Top](#1)
+</template>
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/highlight.min.js"></script>
+<script src="./dist/talkie.js"></script>
+<script>
+var talkie = Talkie({wide: false});
+
+talkie.next.plug(talkie.control.keydown('s'));
+talkie.next.plug(talkie.control.keydown('n'));
+talkie.prev.plug(talkie.control.keydown('a'));
+talkie.prev.plug(talkie.control.keydown('p'));
+
+document.addEventListener('DOMContentLoaded', function() {
+  var slides = Array.prototype.slice.call(document.querySelectorAll('[layout]'));
+  talkie.changed.onValue(function(current) {
+    console.clear();
+    // print presenter notes
+    console.info(talkie.notes[current.getAttribute('page')]);
+  });
+});
+</script>
+</body>
+</html>
